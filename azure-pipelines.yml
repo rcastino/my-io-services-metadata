@@ -50,6 +50,6 @@ jobs:
           Destination: 'AzureBlob'
           storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
           ContainerName: '$(BLOB_CONTAINER_NAME)'
-          AdditionalArgumentsForBlobCopy: '--exclude-path "README.md,CODEOWNERS,yarn.lock,azure-pipelines.yml"'
+          AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;azure-pipelines.yml"'
         displayName: Deploy to container blob      
 
