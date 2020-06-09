@@ -8,8 +8,10 @@
 # The following pipeline variables have to be added and configured based on the
 # environment:
 # - PRODUCTION_AZURE_SUBSCRIPTION: service connection name
-# - TEST_AZURE_SUBSCRIPTION: service connection name for test only
+# - PRODUCTION_STORAGE_ACCOUNT_NAME: storage account name
 #
+# - TEST_AZURE_SUBSCRIPTION: service connection name for test only
+# - TEST_STORAGE_ACCOUNT_NAME: storage account name for test only
 
 parameters:
   - name: 'ENVIRONMENT'
@@ -23,6 +25,8 @@ parameters:
 variables:
   - name: SELECTED_ENV
     value: ${{ parameters.ENVIRONMENT }}
+  - name: BLOB_CONTAINER_NAME
+    value: '$web'
 
 # Linux based agent is faster
 pool:
@@ -33,36 +37,17 @@ trigger: none
 
 jobs:
   - job: publish_assets 
-    steps:
-      # 1. Set the number of the build
-      - task: PowerShell@2
-        displayName: Update Build Number
+    steps:  
+      # 1. Publish GitHub content in PRODUCTION env 
+      # The copying is done from the root folder of the GitHub repository to the given 
+      # container blob in the specified storage account
+      #  $(System.DefaultWorkingDirectory)/dist/*
+      - task: AzureFileCopy@4
         inputs:
-          targetType: 'inline'
-          script: '$id = "$(Build.BuildId)"; $date = Get-Date -Format "yyyy.MMdd"; Write-Host "##vso[build.updatebuildnumber]$date.$id"'
-
-      # 2. Install the Az PowerShell modules our script will need (Az.Accounts, Az.KeyVault, Az.Resources)
-      - task: PowerShell@2
-        displayName: Install Az Modules
-        inputs:
-          targetType: 'inline'
-          script: 'Install-Module Az.Accounts, Az.KeyVault, Az.Resources -Force'
-          errorActionPreference: 'stop'
-          failOnStderr: true
-          pwsh: true
-
-      # Publish GitHub content in PRODUCTION env
-      - task: AzurePowerShell@4
-        displayName: 'PROD - Order or Renew Certificate'
-        condition: and(succeeded(), eq(variables['RENEW_CERT_ENV'], 'PRODUCTION'))
-        inputs:
+          sourcePath: ' $(Build.SourcesDirectory)'
           azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
-          scriptType: 'FilePath'
-          scriptPath: 'New-AcmeCertificate.ps1 '
-          scriptArguments: '-AcmeDirectory "$(PRODUCTION_AcmeDirectory)" -AcmeContact "$(PRODUCTION_AcmeContact)" -CertificateNames "$(PRODUCTION_CertificateNames)" -KeyVaultResourceId "$(PRODUCTION_KeyVaultResourceId)" -ForceRenewal "${{ parameters.FORCE }}"'
-          errorActionPreference: 'stop'
-          failOnStandardError: true
-          azurePowerShellVersion: 'LatestVersion'
-        env:
-          PSModulePath: $(PSModulePath)
+          destination: 'AzureBlob'
+          storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
+          containerName: '$(BLOB_CONTAINER_NAME)'
+        displayName: Deploy to container blob      
 
