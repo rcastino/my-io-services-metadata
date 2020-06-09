@@ -1,7 +1,16 @@
-# Azure DevOps pipeline for automating the copy of the metadata and other assets 
-# contained in this repository into the Storage account used by the CDN.
+# Azure DevOps pipeline for uploading files from this repository to a container 
+# on Azure storage account that is served up via the static website support and 
+# fronted via an Azure CDN. 
+# 
+# WARNING. The current implementation is based on DevOps AzureFileCopy task that  
+# copies the new files up to Azure Storage overwriting the existing ones but never 
+# removes the old files.
+# In most scenarios, this is not a problem and avoid to remove assets that could be
+# still requested by old client versions (e.g. mobile apps). By the way, in the
+# future we could add the option to copy out the new files, update existing files 
+# and remove the ones that no longer exist (using AzCopy sync command). 
 #
-# The following parameter needs to be set to identify the environment for which
+# The following parameters needs to be set to identify the environment for which
 # should be synchronized the content with the master branch of this repository:
 # - ENVIRONMENT: TEST | PRODUCTION
 #
@@ -14,13 +23,15 @@
 # - TEST_STORAGE_ACCOUNT_NAME: storage account name for test only
 
 parameters:
-  - name: 'ENVIRONMENT'
-    displayName: 'Select the environment:'
-    type: string
-    default: TEST
-    values:
-      - TEST  
-      - PRODUCTION
+  - name: 'TEST_ENABLE_DEPLOY'
+    displayName: 'Copy files on test environment'
+    type: boolean
+    default: false
+
+  - name: 'PRODUCTION_ENABLE_DEPLOY'
+    displayName: 'Copy files in produstion environment'
+    type: boolean
+    default: true
 
 variables:
   - name: SELECTED_ENV
@@ -35,21 +46,24 @@ pool:
 # No trigger for this pipeline
 trigger: none
 
-jobs:
-  - job: publish_assets 
-    steps:  
-      # 1. Publish GitHub content in PRODUCTION env 
-      # Uploading files from source path: 'D:\a\1\s\*' to storage account: 'myioslotstorageaccount2' in container: '$web'
-      # The copying is done from the root folder of the GitHub repository to the given 
-      # container blob in the specified storage account
-      #  $(System.DefaultWorkingDirectory)/dist/*
-      - task: AzureFileCopy@4
-        inputs:
-          SourcePath: '$(System.DefaultWorkingDirectory)/*'
-          azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
-          Destination: 'AzureBlob'
-          storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
-          ContainerName: '$(BLOB_CONTAINER_NAME)'
-          AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;azure-pipelines.yml;.git;.circleci" --exclude-pattern ".*"'
-        displayName: Deploy to container blob      
+stages:
+  - ${{ if eq(parameters.TEST_ENABLE_DEPLOY, true) }}:
+    - stage: Publish_files_test
+      jobs:
+        - job: publish_assets
+          steps:  
+            # 1. Publish GitHub content in PRODUCTION env 
+            # Uploading files from source path: 'D:\a\1\s\*' to storage account: 'myioslotstorageaccount2' in container: '$web'
+            # The copying is done from the root folder of the GitHub repository to the given 
+            # container blob in the specified storage account
+            #  $(System.DefaultWorkingDirectory)/dist/*
+            - task: AzureFileCopy@4
+              inputs:
+                SourcePath: '$(System.DefaultWorkingDirectory)/*'
+                azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
+                Destination: 'AzureBlob'
+                storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
+                ContainerName: '$(BLOB_CONTAINER_NAME)'
+                AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;definitions;src" --exclude-pattern ".*"'
+              displayName: Deploy to container blob      
 
