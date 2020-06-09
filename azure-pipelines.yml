@@ -38,13 +38,16 @@ trigger: none
 jobs:
   - job: publish_assets 
     steps:  
+      - bash: 
+          ls -la
+
       # 1. Publish GitHub content in PRODUCTION env 
       # The copying is done from the root folder of the GitHub repository to the given 
       # container blob in the specified storage account
       #  $(System.DefaultWorkingDirectory)/dist/*
       - task: AzureFileCopy@4
         inputs:
-          sourcePath: '$(Build.SourcesDirectory)'
+          sourcePath: '$(System.DefaultWorkingDirectory)/*'
           azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
           destination: 'AzureBlob'
           storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
