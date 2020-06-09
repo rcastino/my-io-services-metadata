@@ -44,7 +44,7 @@ jobs:
       #  $(System.DefaultWorkingDirectory)/dist/*
       - task: AzureFileCopy@4
         inputs:
-          sourcePath: ' $(Build.SourcesDirectory)'
+          sourcePath: '$(Build.SourcesDirectory)'
           azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
           destination: 'AzureBlob'
           storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
