@@ -34,8 +34,6 @@ parameters:
     default: true
 
 variables:
-  - name: SELECTED_ENV
-    value: ${{ parameters.ENVIRONMENT }}
   - name: BLOB_CONTAINER_NAME
     value: '$web'
 
