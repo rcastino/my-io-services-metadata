@@ -26,7 +26,7 @@ variables:
   - name: SELECTED_ENV
     value: ${{ parameters.ENVIRONMENT }}
   - name: BLOB_CONTAINER_NAME
-    value: '$web'
+    value: 'services'
 
 # Use Windows VM because the AzureFileCopy task is supported only on that OS
 pool:
@@ -42,6 +42,7 @@ jobs:
           ls -la
 
       # 1. Publish GitHub content in PRODUCTION env 
+      # Uploading files from source path: 'D:\a\1\s\*' to storage account: 'myioslotstorageaccount2' in container: '$web'
       # The copying is done from the root folder of the GitHub repository to the given 
       # container blob in the specified storage account
       #  $(System.DefaultWorkingDirectory)/dist/*
