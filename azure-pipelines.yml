@@ -55,8 +55,8 @@ jobs:
             Destination: 'AzureBlob'
             storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
             ContainerName: '$(BLOB_CONTAINER_NAME)'
-            AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;definitions;src" --exclude-pattern ".*"'
-          displayName: Copy to container blob (prod)
+            AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;definitions;src;.circleci;.git"'
+          displayName: Copy to container blob ($(PRODUCTION_STORAGE_ACCOUNT_NAME))
 
   - ${{ if eq(parameters.TEST_ENABLE_DEPLOY, true) }}:
     - job: publish_assets_test
@@ -68,5 +68,5 @@ jobs:
             Destination: 'AzureBlob'
             storage: '$(TEST_STORAGE_ACCOUNT_NAME)'
             ContainerName: '$(BLOB_CONTAINER_NAME)'
-            AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;definitions;src" --exclude-pattern ".*"'
-          displayName: Copy to container blob (test)
+            AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;definitions;src;.circleci;.git"'
+          displayName: Copy to container blob ($(TEST_STORAGE_ACCOUNT_NAME))
