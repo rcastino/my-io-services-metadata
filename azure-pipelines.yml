@@ -28,9 +28,9 @@ variables:
   - name: BLOB_CONTAINER_NAME
     value: '$web'
 
-# Linux based agent is faster
+# Use Windows VM because the AzureFileCopy task is supported only on that OS
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-2019'
 
 # No trigger for this pipeline
 trigger: none
