@@ -23,15 +23,15 @@
 # - TEST_STORAGE_ACCOUNT_NAME: storage account name for test only
 
 parameters:
-  - name: 'TEST_ENABLE_DEPLOY'
-    displayName: 'Copy files on test environment'
-    type: boolean
-    default: false
-
   - name: 'PRODUCTION_ENABLE_DEPLOY'
-    displayName: 'Copy files in produstion environment'
+    displayName: 'Copy files in production environment'
     type: boolean
     default: true
+
+  - name: 'TEST_ENABLE_DEPLOY'
+    displayName: 'Copy files in test environment'
+    type: boolean
+    default: false
 
 variables:
   - name: BLOB_CONTAINER_NAME
