@@ -26,7 +26,7 @@ variables:
   - name: SELECTED_ENV
     value: ${{ parameters.ENVIRONMENT }}
   - name: BLOB_CONTAINER_NAME
-    value: 'services'
+    value: '$web'
 
 # Use Windows VM because the AzureFileCopy task is supported only on that OS
 pool:
@@ -38,9 +38,6 @@ trigger: none
 jobs:
   - job: publish_assets 
     steps:  
-      - bash: 
-          ls -la
-
       # 1. Publish GitHub content in PRODUCTION env 
       # Uploading files from source path: 'D:\a\1\s\*' to storage account: 'myioslotstorageaccount2' in container: '$web'
       # The copying is done from the root folder of the GitHub repository to the given 
@@ -48,10 +45,11 @@ jobs:
       #  $(System.DefaultWorkingDirectory)/dist/*
       - task: AzureFileCopy@4
         inputs:
-          sourcePath: '$(System.DefaultWorkingDirectory)/*'
+          SourcePath: '$(System.DefaultWorkingDirectory)/*'
           azureSubscription: '$(PRODUCTION_AZURE_SUBSCRIPTION)'
-          destination: 'AzureBlob'
+          Destination: 'AzureBlob'
           storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
-          containerName: '$(BLOB_CONTAINER_NAME)'
+          ContainerName: '$(BLOB_CONTAINER_NAME)'
+          AdditionalArgumentsForBlobCopy: '--exclude-path README.md;CODEOWNERS;yarn.lock;azure-pipelines.yml --exclude-pattern .*'
         displayName: Deploy to container blob      
 
