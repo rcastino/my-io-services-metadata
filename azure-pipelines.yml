@@ -57,20 +57,20 @@ trigger:
 jobs:
   - ${{ if eq(parameters.PRODUCTION_ENABLE_DATA_COPY, true) }}:
     - job: publish_assets_prod
-        conditions: 
-          and(
-            succeeded(),
-            and (
-              eq(variables['ENABLE_DATA_COPY'], true),
-              or(
-                and(
-                  eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-                  ne(variables['Build.Reason'], 'Manual')
-                ),
-                eq(variables['Build.Reason'], 'Manual')
-              )
+      condition: 
+        and(
+          succeeded(),
+          and (
+            eq(variables['ENABLE_DATA_COPY'], true),
+            or(
+              and(
+                eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+                ne(variables['Build.Reason'], 'Manual')
+              ),
+              eq(variables['Build.Reason'], 'Manual')
             )
           )
+        )
       steps:  
         - task: AzureFileCopy@4
           inputs:
@@ -84,20 +84,20 @@ jobs:
 
   - ${{ if eq(parameters.TEST_ENABLE_DATA_COPY, true) }}:
     - job: publish_assets_test
-        conditions: 
-          and(
-            succeeded(),
-            and (
-              eq(variables['ENABLE_DATA_COPY'], true),
-              or(
-                and(
-                  eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-                  ne(variables['Build.Reason'], 'Manual')
-                ),
-                eq(variables['Build.Reason'], 'Manual')
-              )
+      condition: 
+        and(
+          succeeded(),
+          and (
+            eq(variables['ENABLE_DATA_COPY'], true),
+            or(
+              and(
+                eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+                ne(variables['Build.Reason'], 'Manual')
+              ),
+              eq(variables['Build.Reason'], 'Manual')
             )
           )
+        )
       steps:  
         - task: AzureFileCopy@4
           inputs:
