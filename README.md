@@ -1,4 +1,4 @@
-# Services Metadata for the Digital Citizenship initiative
+# Services Metadata for the Digital Citizenship initiative (RAI)
 
 This repository contains metadata for services used by the IO app.
 
