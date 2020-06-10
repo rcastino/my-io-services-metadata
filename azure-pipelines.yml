@@ -42,6 +42,8 @@ parameters:
 variables:
   - name: BLOB_CONTAINER_NAME
     value: '$web'
+  - name: EXCLUDE_PATH
+    value: 'README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;.node-version;.prettierrc;jest.config.js;tsconfig.json;tslint.json;definitions;src;.circleci;.git'
 
 # Use Windows VM because the AzureFileCopy task is supported only on that OS
 pool:
@@ -79,7 +81,7 @@ jobs:
             Destination: 'AzureBlob'
             storage: '$(PRODUCTION_STORAGE_ACCOUNT_NAME)'
             ContainerName: '$(BLOB_CONTAINER_NAME)'
-            AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;definitions;src;.circleci;.git"'
+            AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "$(EXCLUDE_PATH)"'
           displayName: Copy to container blob ($(PRODUCTION_STORAGE_ACCOUNT_NAME))
 
   - ${{ if eq(parameters.TEST_ENABLE_DATA_COPY, true) }}:
@@ -106,5 +108,5 @@ jobs:
             Destination: 'AzureBlob'
             storage: '$(TEST_STORAGE_ACCOUNT_NAME)'
             ContainerName: '$(BLOB_CONTAINER_NAME)'
-            AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;definitions;src;.circleci;.git"'
+            AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "$(EXCLUDE_PATH)"'
           displayName: Copy to container blob ($(TEST_STORAGE_ACCOUNT_NAME))
