@@ -1,6 +1,9 @@
-# Azure DevOps pipeline for uploading files from this repository to a container 
-# on Azure storage account that is served up via the static website support and 
-# fronted via an Azure CDN. 
+# Azure DevOps pipeline for validating and testing the tools implemented in this
+# repositories and for publishing the data to a CDN.
+#
+# The main goal of this pipeline is the uploading of the files from this repository 
+# to a container on Azure storage account that is served up via the static website 
+# support and fronted via an Azure CDN. 
 # 
 # WARNING. The current implementation is based on DevOps AzureFileCopy task that  
 # copies the new files up to Azure Storage overwriting the existing ones but never 
@@ -43,7 +46,7 @@ variables:
   - name: BLOB_CONTAINER_NAME
     value: '$web'
   - name: EXCLUDE_PATH
-    value: 'README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;.node-version;.prettierrc;jest.config.js;tsconfig.json;tslint.json;definitions;src;.circleci;.git'
+    value: 'README.md;CODEOWNERS;yarn.lock;package.json;azure-pipelines.yml;.node-version;.nvmrc;.prettierrc;jest.config.js;tsconfig.json;tslint.json;definitions;src;.circleci;.git'
   - name: NODE_VERSION
     value: '8.11.3'
   - name: YARN_CACHE_FOLDER
@@ -131,7 +134,7 @@ stages:
               displayName: Copy to container blob ($(PRODUCTION_STORAGE_ACCOUNT_NAME))
 
 
-  # D) Copy data from this repository to the storage to make them available on CDN nodes in PROD
+  # D) Copy data from this repository to the storage to make them available on CDN nodes in TEST
   - ${{ if eq(parameters.TEST_ENABLE_DATA_COPY, true) }}:
     - stage: Publish_test
       condition:
@@ -148,6 +151,8 @@ stages:
             )
           )
         )
+      pool:
+        vmImage: 'windows-2019'  
       dependsOn:
         - Validation
         - Test
