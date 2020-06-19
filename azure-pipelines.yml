@@ -62,18 +62,11 @@ trigger:
       - 'master'
 
 stages:
-  # A) Build and code validation
-  - stage: Build
+  # A) Code validation
+  - stage: Validation
     dependsOn: []
-    jobs:
-      # A1) Checkout, install module and build code
-      - job: make_build      
-        steps:
-        - template: azure-templates/make-build-steps.yml
-          parameters:
-            make: build
-            
-      # A2) Analyze source code to find errors with lint
+    jobs:            
+      # A1) Analyze source code to find errors with lint
       - job: lint   
         steps:
         - template: azure-templates/make-build-steps.yml
@@ -84,7 +77,7 @@ stages:
             yarn lint
           displayName: 'Lint'
 
-      # A4) Run Danger (skipping if not executing on a PR)
+      # A2) Run Danger (skipping if not executing on a PR)
       - job: danger
         condition: 
           and(
