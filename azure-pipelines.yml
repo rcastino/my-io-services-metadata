@@ -1,7 +1,10 @@
-# Azure DevOps pipeline for uploading files from this repository to a container 
-# on Azure storage account that is served up via the static website support and 
-# fronted via an Azure CDN. 
-# 
+# Azure DevOps pipeline for validating and testing the tools implemented in this
+# repositories and for publishing the data to a CDN.
+#
+# The main goal of this pipeline is the uploading of the files from this repository 
+# to a container on Azure storage account that is served up via the static website 
+# support and fronted via an Azure CDN. 
+#
 # WARNING. The current implementation is based on DevOps AzureFileCopy task that  
 # copies the new files up to Azure Storage overwriting the existing ones but never 
 # removes the old files.
@@ -59,7 +62,7 @@ pool:
 trigger:
   branches:
     include:
-      - 'master'
+      - '*'
 
 stages:
   # A) Code validation
@@ -116,7 +119,9 @@ stages:
   - stage: Publish
     pool:
       vmImage: 'windows-2019'
-    dependsOn: []
+    dependsOn:
+      - Build
+      - Test
     jobs:
       - ${{ if eq(parameters.PRODUCTION_ENABLE_DATA_COPY, true) }}:
         - job: publish_assets_prod
