@@ -94,6 +94,7 @@ stages:
             bash <(curl -s https://codecov.io/bash)
           displayName: 'Code coverage'
 
+
   # C) Copy data from this repository to the storage to make them available on CDN nodes in PROD
   - ${{ if eq(parameters.PRODUCTION_ENABLE_DATA_COPY, true) }}:
     - stage: Publish_production
@@ -128,6 +129,7 @@ stages:
                 ContainerName: '$(BLOB_CONTAINER_NAME)'
                 AdditionalArgumentsForBlobCopy: '--recursive --exclude-path "$(EXCLUDE_PATH)"'
               displayName: Copy to container blob ($(PRODUCTION_STORAGE_ACCOUNT_NAME))
+
 
   # D) Copy data from this repository to the storage to make them available on CDN nodes in PROD
   - ${{ if eq(parameters.TEST_ENABLE_DATA_COPY, true) }}:
