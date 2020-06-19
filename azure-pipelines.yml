@@ -59,7 +59,7 @@ pool:
 trigger:
   branches:
     include:
-      - 'master'
+      - '*'
 
 stages:
   # A) Code validation
