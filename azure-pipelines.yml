@@ -120,7 +120,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     dependsOn:
-      - Build
+      - Validation
       - Test
     jobs:
       - ${{ if eq(parameters.PRODUCTION_ENABLE_DATA_COPY, true) }}:
